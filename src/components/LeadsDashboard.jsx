@@ -70,7 +70,10 @@ export default function LeadsDashboard({ settings, updateSettings }) {
       try {
         n8nResponse = await fetch(settings.n8nWebhookUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
+          },
           body: JSON.stringify({ niche: activeNiche, trigger: 'manual', timestamp: new Date().toISOString() }),
           signal: AbortSignal.timeout(10000),
         });
