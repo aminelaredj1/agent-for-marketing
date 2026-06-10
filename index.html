@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Lead Hunter • Intelligence Commerciale</title>
+    <meta name="description" content="Capturez et convertissez des prospects Facebook grâce à l'intelligence artificielle. Système automatisé de prospection commerciale.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,200;14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #030407;
+            --bg-primary: #06080f;
+            --bg-surface: #0c0e18;
+            --bg-card: rgba(12, 14, 24, 0.6);
+            --bg-card-hover: rgba(18, 21, 35, 0.8);
+            --border-subtle: rgba(255,255,255,0.04);
+            --border-low: rgba(255,255,255,0.06);
+            --border-medium: rgba(99,102,241,0.15);
+            --border-glow: rgba(99,102,241,0.4);
+            --text-primary: #eef0f6;
+            --text-secondary: #8b90a8;
+            --text-muted: #484e6a;
+            --accent-1: #6366f1;
+            --accent-2: #3b82f6;
+            --accent-3: #8b5cf6;
+            --green: #10b981;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --sidebar-w: 260px;
+            --r-sm: 10px;
+            --r-md: 14px;
+            --r-lg: 18px;
+            --r-xl: 24px;
+        }
+
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { font-size:15px; }
+        body {
+            font-family:'Inter', system-ui, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ── ambient bg ── */
+        .ambient {
+            position:fixed; inset:0; z-index:0; pointer-events:none;
+            background:
+                radial-gradient(ellipse 900px 700px at 15% 10%, rgba(99,102,241,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 700px 600px at 85% 80%, rgba(59,130,246,0.05) 0%, transparent 55%),
+                radial-gradient(ellipse 500px 400px at 55% 45%, rgba(139,92,246,0.04) 0%, transparent 55%);
+        }
+        .grid-overlay {
+            position:fixed; inset:0; z-index:0; pointer-events:none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        ::-webkit-scrollbar { width:5px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:rgba(99,102,241,0.35); border-radius:10px; }
+
+        /* ════════════════════ SIDEBAR ════════════════════ */
+        .sidebar {
+            position:fixed; left:0; top:0; bottom:0;
+            width: var(--sidebar-w);
+            z-index:200;
+            display:flex; flex-direction:column;
+            background: rgba(6,8,15,0.85);
+            backdrop-filter: blur(32px) saturate(160%);
+            border-right: 1px solid var(--border-subtle);
+        }
+
+        .sb-logo {
+            padding: 32px 24px 28px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .sb-logo .mark {
+            display:flex; align-items:center; gap:12px; margin-bottom:6px;
+        }
+        .logo-cube {
+            width:36px; height:36px; border-radius:10px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            display:flex; align-items:center; justify-content:center;
+            box-shadow: 0 0 20px rgba(99,102,241,0.4);
+            flex-shrink:0;
+        }
+        .logo-cube svg { width:18px; height:18px; stroke:white; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+        .sb-logo .wordmark {
+            font-size:1.05rem; font-weight:800; letter-spacing:-0.4px;
+            background: linear-gradient(135deg, #c7d2fe, #818cf8, #60a5fa);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+        .sb-logo .tagline { font-size:0.72rem; color:var(--text-muted); letter-spacing:0.2px; padding-left:2px; }
+
+        .sb-nav { flex:1; padding:20px 14px; display:flex; flex-direction:column; gap:3px; overflow-y:auto; }
+
+        .nav-label {
+            font-size:0.63rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+            color:var(--text-muted); padding: 12px 14px 6px; margin-top:8px;
+        }
+        .nav-label:first-child { margin-top:0; }
+
+        .nav-item {
+            display:flex; align-items:center; gap:12px;
+            padding: 11px 14px; border-radius:var(--r-md);
+            cursor:pointer; font-size:0.875rem; font-weight:500;
+            color:var(--text-secondary); letter-spacing:-0.1px;
+            transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+            border: 1px solid transparent; position:relative;
+            user-select:none;
+        }
+        .nav-item:hover { background:rgba(255,255,255,0.035); color:var(--text-primary); border-color:var(--border-subtle); }
+        .nav-item.active {
+            background: rgba(99,102,241,0.1); color:#fff;
+            border-color:rgba(99,102,241,0.25);
+            box-shadow: 0 2px 16px rgba(99,102,241,0.15);
+        }
+        .nav-item.active .ni-icon { color:var(--accent-1); }
+        .nav-item.active::before {
+            content:''; position:absolute; left:-1px; top:8px; bottom:8px;
+            width:3px; border-radius:0 3px 3px 0;
+            background:linear-gradient(180deg, var(--accent-1), var(--accent-2));
+        }
+        .ni-icon { width:18px; height:18px; flex-shrink:0; }
+        .ni-icon svg { width:100%; height:100%; stroke:currentColor; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+        .ni-badge {
+            margin-left:auto; font-size:0.6rem; font-weight:700;
+            padding: 2px 8px; border-radius:20px; letter-spacing:0.5px;
+        }
+        .badge-new { background:rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.25); animation:pulseBadge 3s ease-in-out infinite; }
+        .badge-ai  { background:rgba(139,92,246,0.12); color:#a78bfa; border:1px solid rgba(139,92,246,0.25); }
+        .badge-live { background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25); animation:pulseBadge 1.5s ease-in-out infinite; }
+
+        .sb-footer {
+            padding:18px 24px;
+            border-top:1px solid var(--border-subtle);
+            display:flex; align-items:center; justify-content:space-between;
+        }
+        .sys-status { display:flex; align-items:center; gap:9px; font-size:0.78rem; color:var(--text-secondary); }
+        .pulse-dot {
+            width:8px; height:8px; border-radius:50%; background:var(--green);
+            box-shadow:0 0 10px rgba(16,185,129,0.7);
+            animation:pulseDot 2.5s ease-in-out infinite;
+        }
+
+        /* ════════════════════ MAIN ════════════════════ */
+        .main { margin-left:var(--sidebar-w); min-height:100vh; position:relative; z-index:1; }
+
+        .page { display:none; padding:40px 44px; animation:fadeUp 0.45s cubic-bezier(0.23,1,0.32,1); }
+        .page.active { display:block; }
+
+        .page-header { margin-bottom:36px; }
+        .page-title { font-size:1.75rem; font-weight:800; letter-spacing:-0.8px; margin-bottom:6px; }
+        .page-sub { font-size:0.9rem; color:var(--text-secondary); font-weight:400; }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px) saturate(160%);
+            border: 1px solid var(--border-low);
+            border-radius:var(--r-lg);
+            padding:28px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .card:hover { border-color:var(--border-medium); }
+
+        /* ── Hero ── */
+        .hero {
+            position:relative; overflow:hidden;
+            border-radius:var(--r-xl);
+            padding: 56px 52px;
+            background: linear-gradient(135deg, rgba(10,12,22,0.95) 0%, rgba(8,10,20,0.9) 100%);
+            border: 1px solid rgba(99,102,241,0.12);
+            box-shadow: 0 0 80px rgba(99,102,241,0.08), 0 8px 40px rgba(0,0,0,0.7);
+            margin-bottom:40px;
+        }
+        .hero-grid {
+            position:absolute; inset:0; z-index:0; pointer-events:none;
+            background-image:
+                linear-gradient(rgba(99,102,241,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99,102,241,0.06) 1px, transparent 1px);
+            background-size:40px 40px;
+            mask-image:radial-gradient(ellipse 70% 80% at 50% 50%, black 0%, transparent 100%);
+        }
+        .hero-glow {
+            position:absolute; pointer-events:none;
+            border-radius:50%; filter:blur(80px);
+        }
+        .glow-a { width:400px; height:400px; background:rgba(99,102,241,0.18); top:-150px; right:-100px; animation:orbDrift 10s ease-in-out infinite alternate; }
+        .glow-b { width:280px; height:280px; background:rgba(59,130,246,0.14); bottom:-100px; left:-60px; animation:orbDrift 13s ease-in-out infinite alternate-reverse; }
+        .hero-content { position:relative; z-index:1; }
+        .hero-eyebrow {
+            display:inline-flex; align-items:center; gap:8px;
+            font-size:0.72rem; font-weight:700; letter-spacing:1.8px; text-transform:uppercase;
+            color:var(--accent-1); margin-bottom:20px;
+            background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2);
+            padding:6px 14px; border-radius:20px;
+        }
+        .hero-eyebrow-dot { width:6px; height:6px; border-radius:50%; background:var(--accent-1); animation:pulseDot 2s infinite; }
+        .hero-title {
+            font-size:3.4rem; font-weight:900; letter-spacing:-2px; line-height:1.1;
+            background: linear-gradient(135deg, #e0e7ff 0%, #a5b4fc 40%, #60a5fa 75%, #818cf8 100%);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+            margin-bottom:20px;
+        }
+        .hero-desc { font-size:1.05rem; color:var(--text-secondary); max-width:640px; line-height:1.75; font-weight:400; }
+
+        /* ── Steps ── */
+        .steps-row {
+            display:grid; grid-template-columns:repeat(5,1fr);
+            gap:16px; margin-bottom:40px;
+        }
+        .step-card {
+            background:var(--bg-card); border:1px solid var(--border-low);
+            border-radius:var(--r-lg); padding:24px 18px;
+            text-align:center; transition:all 0.35s cubic-bezier(0.23,1,0.32,1);
+            position:relative; overflow:hidden;
+        }
+        .step-card::before {
+            content:''; position:absolute; inset:0; opacity:0;
+            background:linear-gradient(135deg, rgba(99,102,241,0.05), transparent);
+            transition:opacity 0.3s;
+        }
+        .step-card:hover { transform:translateY(-5px); border-color:rgba(99,102,241,0.3); box-shadow:0 12px 36px rgba(0,0,0,0.5), 0 0 20px rgba(99,102,241,0.12); }
+        .step-card:hover::before { opacity:1; }
+        .step-num {
+            font-size:0.62rem; font-weight:800; letter-spacing:2px; text-transform:uppercase;
+            color:var(--text-muted); margin-bottom:16px;
+        }
+        .step-icon-wrap {
+            width:44px; height:44px; border-radius:12px; margin:0 auto 14px;
+            background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.15);
+            display:flex; align-items:center; justify-content:center;
+        }
+        .step-icon-wrap svg { width:22px; height:22px; stroke:var(--accent-1); fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+        .step-title { font-size:0.88rem; font-weight:700; margin-bottom:6px; }
+        .step-desc { font-size:0.74rem; color:var(--text-muted); line-height:1.5; }
+
+        /* ── Config checklist ── */
+        .checklist { display:flex; flex-direction:column; }
+        .check-row {
+            display:flex; align-items:center; gap:14px;
+            padding:14px 0; border-bottom:1px solid var(--border-subtle);
+        }
+        .check-row:last-child { border-bottom:none; }
+        .check-badge {
+            width:8px; height:8px; border-radius:50%; flex-shrink:0;
+        }
+        .check-badge.ok { background:var(--green); box-shadow:0 0 8px rgba(16,185,129,0.6); }
+        .check-badge.warn { background:var(--orange); }
+        .check-text { font-size:0.875rem; flex:1; }
+        .check-status { font-size:0.72rem; font-weight:600; }
+        .check-status.ok { color:var(--green); }
+        .check-status.warn { color:var(--orange); }
+
+        /* ══ HUNT PAGE ══ */
+        .hunt-controls {
+            display:flex; gap:16px; align-items:flex-end; flex-wrap:wrap;
+            margin-bottom:8px;
+        }
+        .field-group { display:flex; flex-direction:column; gap:8px; }
+        .field-label { font-size:0.72rem; font-weight:600; letter-spacing:0.8px; text-transform:uppercase; color:var(--text-muted); }
+
+        select, input, textarea {
+            background:rgba(255,255,255,0.04); border:1px solid var(--border-low);
+            border-radius:var(--r-sm); color:var(--text-primary);
+            padding:12px 16px; font-family:'Inter',sans-serif;
+            font-size:0.875rem; outline:none; width:100%;
+            transition:border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance:none;
+        }
+        select { cursor:pointer; }
+        input::placeholder, textarea::placeholder { color:var(--text-muted); }
+        select:focus, input:focus, textarea:focus {
+            border-color:var(--accent-1); box-shadow:0 0 0 3px rgba(99,102,241,0.12);
+        }
+
+        .btn {
+            display:inline-flex; align-items:center; justify-content:center; gap:8px;
+            border:none; border-radius:var(--r-sm); padding:13px 26px;
+            font-family:'Inter',sans-serif; font-size:0.875rem; font-weight:600;
+            cursor:pointer; letter-spacing:-0.1px; transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+            white-space:nowrap; user-select:none;
+        }
+        .btn-primary {
+            background:linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color:#fff; box-shadow:0 4px 20px rgba(99,102,241,0.3);
+        }
+        .btn-primary:hover { box-shadow:0 6px 28px rgba(99,102,241,0.5); transform:translateY(-1px); }
+        .btn-primary:active { transform:translateY(0); }
+        .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+        .btn-ghost {
+            background:rgba(255,255,255,0.04); color:var(--text-secondary);
+            border:1px solid var(--border-low);
+        }
+        .btn-ghost:hover { background:rgba(255,255,255,0.07); color:var(--text-primary); }
+        .btn-success {
+            background:linear-gradient(135deg, #059669, var(--green));
+            color:#fff; box-shadow:0 4px 20px rgba(16,185,129,0.3);
+        }
+        .btn-success:hover { box-shadow:0 6px 28px rgba(16,185,129,0.5); transform:translateY(-1px); }
+
+        .btn svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+        /* Progress */
+        .progress-wrap { margin:20px 0 6px; }
+        .progress-track { height:4px; background:rgba(255,255,255,0.05); border-radius:4px; overflow:hidden; }
+        .progress-fill {
+            height:100%; width:0%;
+            background:linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            border-radius:4px; transition:width 0.35s ease;
+            box-shadow:0 0 12px rgba(99,102,241,0.5);
+        }
+        .progress-label { font-size:0.72rem; color:var(--text-muted); margin-top:8px; }
+
+        /* Stats */
+        .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+        .stat-card {
+            background:var(--bg-card); border:1px solid var(--border-low);
+            border-radius:var(--r-lg); padding:22px 24px;
+            display:flex; flex-direction:column; gap:8px;
+        }
+        .stat-label { font-size:0.72rem; font-weight:600; letter-spacing:0.8px; text-transform:uppercase; color:var(--text-muted); }
+        .stat-val { font-size:2.1rem; font-weight:800; letter-spacing:-1.5px; line-height:1; }
+        .stat-sub { font-size:0.72rem; color:var(--text-muted); }
+        .stat-val.green { color:var(--green); }
+        .stat-val.indigo { color:var(--accent-1); }
+        .stat-val.orange { color:var(--orange); }
+
+        /* Table */
+        .table-wrap { border-radius:var(--r-lg); overflow:hidden; border:1px solid var(--border-low); }
+        table { width:100%; border-collapse:collapse; background:var(--bg-card); backdrop-filter:blur(20px); }
+        thead tr { background:rgba(255,255,255,0.025); }
+        th {
+            text-align:left; padding:14px 18px;
+            font-size:0.68rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+            color:var(--text-muted);
+        }
+        td { padding:14px 18px; border-top:1px solid var(--border-subtle); font-size:0.86rem; }
+        tr { transition:background 0.15s; }
+        tr:hover td { background:rgba(99,102,241,0.04); }
+        .interest-pill {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:4px 12px; border-radius:20px; font-size:0.68rem; font-weight:700;
+        }
+        .interest-pill .dot { width:5px; height:5px; border-radius:50%; }
+        .pill-high { background:rgba(16,185,129,0.1); color:var(--green); border:1px solid rgba(16,185,129,0.2); }
+        .pill-high .dot { background:var(--green); }
+        .pill-med { background:rgba(245,158,11,0.1); color:var(--orange); border:1px solid rgba(245,158,11,0.2); }
+        .pill-med .dot { background:var(--orange); }
+        .pill-low { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
+        .pill-low .dot { background:var(--red); }
+
+        /* ══ SALES AGENT PAGE ══ */
+        .agent-layout { display:grid; grid-template-columns:280px 1fr; gap:20px; height:76vh; }
+        .lead-panel {
+            background:var(--bg-card); border:1px solid var(--border-low);
+            border-radius:var(--r-lg); overflow:hidden; display:flex; flex-direction:column;
+        }
+        .panel-header { padding:16px 20px; border-bottom:1px solid var(--border-subtle); }
+        .panel-title { font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); }
+        .lead-items { flex:1; overflow-y:auto; padding:10px; }
+        .lead-row {
+            display:flex; align-items:center; gap:12px; padding:12px;
+            border-radius:var(--r-md); cursor:pointer; margin-bottom:3px;
+            transition:all 0.2s; border:1px solid transparent;
+        }
+        .lead-row:hover { background:rgba(255,255,255,0.04); }
+        .lead-row.active { background:rgba(99,102,241,0.08); border-color:rgba(99,102,241,0.2); }
+        .avatar-circle {
+            width:38px; height:38px; border-radius:50%; flex-shrink:0;
+            background:linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            display:flex; align-items:center; justify-content:center;
+            font-weight:700; font-size:0.9rem; letter-spacing:-0.5px;
+            box-shadow:0 0 14px rgba(99,102,241,0.3);
+        }
+        .lead-info .lead-name { font-size:0.875rem; font-weight:600; margin-bottom:3px; }
+        .lead-info .lead-preview { font-size:0.74rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; }
+
+        /* Chat */
+        .chat-box {
+            background:var(--bg-card); border:1px solid var(--border-low);
+            border-radius:var(--r-lg); display:flex; flex-direction:column; overflow:hidden;
+        }
+        .chat-head {
+            padding:18px 24px; border-bottom:1px solid var(--border-subtle);
+            display:flex; align-items:center; justify-content:space-between;
+        }
+        .chat-head-info .chat-name { font-size:1rem; font-weight:700; margin-bottom:2px; }
+        .chat-head-info .chat-meta { font-size:0.74rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+        .chat-live-dot { width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 8px rgba(16,185,129,0.7); }
+        .hormozi-bar {
+            padding:10px 24px; font-size:0.78rem; font-weight:500; letter-spacing:0.1px;
+            background:rgba(245,158,11,0.06); border-bottom:1px solid rgba(245,158,11,0.1);
+            color:rgba(245,158,11,0.85); display:flex; align-items:center; gap:8px;
+        }
+        .hormozi-bar svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+        .messages-area { flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:16px; }
+        .msg-wrap { display:flex; gap:10px; align-items:flex-end; }
+        .msg-wrap.from-ai { flex-direction:row-reverse; }
+        .msg-avatar {
+            width:30px; height:30px; border-radius:50%; flex-shrink:0;
+            display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700;
+        }
+        .msg-avatar.ai { background:linear-gradient(135deg, var(--accent-1), var(--accent-2)); box-shadow:0 0 10px rgba(99,102,241,0.3); }
+        .msg-avatar.client { background:rgba(255,255,255,0.06); border:1px solid var(--border-low); }
+        .bubble {
+            max-width:68%; padding:13px 18px; font-size:0.875rem; line-height:1.6;
+            border-radius:18px;
+        }
+        .bubble.ai {
+            background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.18);
+            border-bottom-right-radius:4px; color:var(--text-primary);
+        }
+        .bubble.client {
+            background:rgba(255,255,255,0.04); border:1px solid var(--border-low);
+            border-bottom-left-radius:4px; color:var(--text-secondary);
+        }
+        .bubble-meta {
+            font-size:0.68rem; color:var(--text-muted); margin-top:5px; padding: 0 4px;
+            display:flex; align-items:center; gap:8px;
+        }
+        .copy-btn {
+            font-size:0.68rem; color:var(--accent-1); cursor:pointer; background:none; border:none;
+            font-family:inherit; padding:2px 6px; border-radius:4px;
+            transition:background 0.15s; display:inline-flex; align-items:center; gap:4px;
+        }
+        .copy-btn:hover { background:rgba(99,102,241,0.1); }
+        .copy-btn svg { width:10px; height:10px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+        .typing-indicator { display:flex; gap:5px; padding:14px 18px; }
+        .typing-indicator span {
+            width:7px; height:7px; border-radius:50%; background:var(--text-muted);
+            animation:typingBounce 1.3s ease-in-out infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay:0.15s; }
+        .typing-indicator span:nth-child(3) { animation-delay:0.3s; }
+        .chat-input-area {
+            padding:16px 20px; border-top:1px solid var(--border-subtle);
+            display:flex; gap:12px; align-items:center;
+        }
+
+        /* ── Connection status banner ── */
+        .conn-banner {
+            display:flex; align-items:center; gap:10px;
+            padding:10px 16px; border-radius:var(--r-sm); margin-bottom:16px;
+            font-size:0.8rem; font-weight:500;
+        }
+        .conn-banner.ok { background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); color:var(--green); }
+        .conn-banner.warn { background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); color:var(--orange); }
+        .conn-banner.err { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); color:var(--red); }
+        .conn-banner svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; flex-shrink:0; }
+
+        /* ══ SETTINGS PAGE ══ */
+        .settings-layout { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+        .settings-section-title {
+            font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+            color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:8px;
+        }
+        .settings-section-title::after { content:''; flex:1; height:1px; background:var(--border-subtle); }
+        .field { margin-bottom:20px; }
+        .field:last-child { margin-bottom:0; }
+        .field-label { font-size:0.72rem; font-weight:600; letter-spacing:0.8px; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; display:block; }
+        .input-with-action { display:flex; gap:8px; }
+        .input-with-action input { flex:1; }
+        .icon-btn {
+            width:46px; height:46px; border-radius:var(--r-sm); cursor:pointer;
+            background:rgba(255,255,255,0.04); border:1px solid var(--border-low);
+            display:flex; align-items:center; justify-content:center;
+            transition:all 0.2s; color:var(--text-secondary); flex-shrink:0;
+        }
+        .icon-btn:hover { background:rgba(255,255,255,0.07); color:var(--text-primary); }
+        .icon-btn svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+        .divider { height:1px; background:var(--border-subtle); margin:24px 0; }
+        .save-row { grid-column:1/-1; }
+
+        /* ── Animations ── */
+        @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes pulseDot { 0%,100% { opacity:1; box-shadow:0 0 10px rgba(16,185,129,0.7); } 50% { opacity:.7; box-shadow:0 0 20px rgba(16,185,129,1); } }
+        @keyframes pulseBadge { 0%,100%{opacity:1;} 50%{opacity:.55;} }
+        @keyframes orbDrift { from { transform:translate(0,0) scale(1); } to { transform:translate(25px,-25px) scale(1.08); } }
+        @keyframes typingBounce { 0%,100%{transform:translateY(0);} 40%{transform:translateY(-7px);} }
+
+        /* ── Toasts ── */
+        .toast {
+            position:fixed; bottom:28px; right:28px; z-index:999;
+            background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3);
+            color:#10b981; padding:13px 22px; border-radius:var(--r-md);
+            font-size:0.875rem; font-weight:600; backdrop-filter:blur(20px);
+            display:flex; align-items:center; gap:10px;
+            animation:fadeUp 0.3s ease-out; box-shadow:0 4px 20px rgba(0,0,0,0.5);
+        }
+        .toast.err { background:rgba(239,68,68,0.12); border-color:rgba(239,68,68,0.3); color:var(--red); }
+        .toast svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+
+        /* n8n status pill in sidebar */
+        .n8n-pill {
+            display:inline-flex; align-items:center; gap:5px; margin-top:4px;
+            font-size:0.65rem; font-weight:600; padding:3px 8px; border-radius:20px;
+            background:rgba(16,185,129,0.1); color:var(--green); border:1px solid rgba(16,185,129,0.2);
+        }
+        .n8n-pill.off { background:rgba(239,68,68,0.1); color:var(--red); border-color:rgba(239,68,68,0.2); }
+        .n8n-pill-dot { width:5px; height:5px; border-radius:50%; background:currentColor; }
+    </style>
+</head>
+<body>
+<div class="ambient"></div>
+<div class="grid-overlay"></div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+    <div class="sb-logo">
+        <div class="mark">
+            <div class="logo-cube">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+            <span class="wordmark">AI Lead Hunter</span>
+        </div>
+        <div class="tagline">Intelligence commerciale automatisée</div>
+        <div class="n8n-pill" id="n8n-status-pill">
+            <div class="n8n-pill-dot"></div>
+            <span id="n8n-status-text">n8n: vérification...</span>
+        </div>
+    </div>
+
+    <nav class="sb-nav">
+        <div class="nav-label">Navigation</div>
+        <div class="nav-item active" id="nav-accueil" data-page="accueil">
+            <div class="ni-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+            Tableau de bord
+        </div>
+        <div class="nav-item" id="nav-chasse" data-page="chasse">
+            <div class="ni-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+            Chasse aux leads
+            <span class="ni-badge badge-live">LIVE</span>
+        </div>
+        <div class="nav-item" id="nav-delegue" data-page="delegue">
+            <div class="ni-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+            Délégué commercial
+            <span class="ni-badge badge-ai">IA</span>
+        </div>
+        <div class="nav-label">Système</div>
+        <div class="nav-item" id="nav-parametres" data-page="parametres">
+            <div class="ni-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg></div>
+            Configuration
+        </div>
+    </nav>
+
+    <div class="sb-footer">
+        <div class="sys-status">
+            <div class="pulse-dot"></div>
+            Système opérationnel
+        </div>
+    </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<main class="main">
+
+    <!-- PAGE 1: Dashboard -->
+    <section class="page active" id="page-accueil">
+        <div class="hero">
+            <div class="hero-grid"></div>
+            <div class="hero-glow glow-a"></div>
+            <div class="hero-glow glow-b"></div>
+            <div class="hero-content">
+                <div class="hero-eyebrow"><div class="hero-eyebrow-dot"></div> Powered by NVIDIA Llama 3.1 × Apify × n8n</div>
+                <h1 class="hero-title">AI Lead Hunter</h1>
+                <p class="hero-desc">Capturez et convertissez automatiquement des prospects depuis Facebook grâce à l'intelligence artificielle. Chaque lead est qualifié, scoré et contacté selon la méthode Alex Hormozi.</p>
+            </div>
+        </div>
+
+        <div class="steps-row">
+            <div class="step-card">
+                <div class="step-num">01</div>
+                <div class="step-icon-wrap"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+                <div class="step-title">Extraction</div>
+                <div class="step-desc">Apify crawle les groupes Facebook ciblés en temps réel</div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">02</div>
+                <div class="step-icon-wrap"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+                <div class="step-title">Classification</div>
+                <div class="step-desc">L'IA analyse l'intention d'achat de chaque publication</div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">03</div>
+                <div class="step-icon-wrap"><svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div>
+                <div class="step-title">Filtrage</div>
+                <div class="step-desc">Sélection des prospects les plus qualifiés</div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">04</div>
+                <div class="step-icon-wrap"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                <div class="step-title">Messages</div>
+                <div class="step-desc">Rédaction de messages personnalisés style Hormozi</div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">05</div>
+                <div class="step-icon-wrap"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+                <div class="step-title">Stockage</div>
+                <div class="step-desc">Sauvegarde dans Google Sheets &amp; CRM</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="settings-section-title">État de la configuration</div>
+            <div class="checklist">
+                <div class="check-row"><div class="check-badge" id="chk-apify"></div><div class="check-text">Clé API Apify</div><div class="check-status" id="chk-apify-txt">Non configurée</div></div>
+                <div class="check-row"><div class="check-badge" id="chk-nvidia"></div><div class="check-text">Clé NVIDIA AI</div><div class="check-status" id="chk-nvidia-txt">Non configurée</div></div>
+                <div class="check-row"><div class="check-badge" id="chk-webhook"></div><div class="check-text">Webhook n8n</div><div class="check-status" id="chk-webhook-txt">Vérification...</div></div>
+                <div class="check-row"><div class="check-badge ok"></div><div class="check-text">Groupes Facebook</div><div class="check-status ok">Chargés</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGE 2: Hunt -->
+    <section class="page" id="page-chasse">
+        <div class="page-header">
+            <div class="page-title">Chasse aux leads</div>
+            <div class="page-sub">Extrayez et qualifiez des prospects depuis les groupes Facebook via n8n + Apify</div>
+        </div>
+
+        <div id="hunt-conn-banner" class="conn-banner warn" style="display:none;">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="hunt-conn-msg">Configuration requise. Allez dans les Paramètres pour définir le Webhook n8n.</span>
+        </div>
+
+        <div class="card" style="margin-bottom:24px;">
+            <div class="hunt-controls">
+                <div class="field-group" style="flex:0 0 200px;">
+                    <div class="field-label">Domaine</div>
+                    <select id="domaine-select">
+                        <option>Omra / Hajj</option>
+                        <option>Automobile</option>
+                        <option>Immobilier</option>
+                        <option>Tourisme</option>
+                        <option>Formation &amp; Éducation</option>
+                        <option>Création Web &amp; App</option>
+                        <option>Montage Vidéo &amp; Design</option>
+                        <option>Marketing Digital</option>
+                        <option>E-commerce &amp; Dropshipping</option>
+                        <option>Coaching &amp; Consulting</option>
+                        <option>Vente de Logiciels (SaaS)</option>
+                    </select>
+                </div>
+                <div class="field-group" style="flex:1; min-width:240px;">
+                    <div class="field-label">Lien du groupe Facebook</div>
+                    <input type="text" id="fb-link" placeholder="https://www.facebook.com/groups/...">
+                </div>
+                <button class="btn btn-primary" id="start-hunt" style="height:46px;">
+                    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Lancer la chasse
+                </button>
+            </div>
+            <div class="progress-wrap">
+                <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+                <div class="progress-label" id="progress-label">Prêt au lancement</div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Total leads</div><div class="stat-val" id="stat-total">0</div><div class="stat-sub">depuis ce lancement</div></div>
+            <div class="stat-card"><div class="stat-label">Intéressés</div><div class="stat-val green" id="stat-interested">0</div><div class="stat-sub">haute intention</div></div>
+            <div class="stat-card"><div class="stat-label">Traités</div><div class="stat-val indigo" id="stat-processed">0</div><div class="stat-sub">par l'IA</div></div>
+            <div class="stat-card"><div class="stat-label">Taux de conversion</div><div class="stat-val orange" id="stat-rate">—</div><div class="stat-sub">estimation</div></div>
+        </div>
+
+        <div class="table-wrap">
+            <table id="leads-table">
+                <thead><tr><th>Nom</th><th>Publication</th><th>Score</th><th>Profil</th><th>Action</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- PAGE 3: Agent -->
+    <section class="page" id="page-delegue">
+        <div class="page-header">
+            <div class="page-title">Délégué commercial IA</div>
+            <div class="page-sub">Conversations intelligentes via n8n • méthode Alex Hormozi</div>
+        </div>
+
+        <div id="agent-conn-banner" class="conn-banner" style="display:none;">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="agent-conn-msg">Vérification de la connexion n8n...</span>
+        </div>
+
+        <div class="agent-layout">
+            <div class="lead-panel">
+                <div class="panel-header"><div class="panel-title">Prospects actifs</div></div>
+                <div class="lead-items" id="lead-list"></div>
+            </div>
+            <div class="chat-box">
+                <div class="chat-head">
+                    <div class="chat-head-info">
+                        <div class="chat-name" id="chat-client-name">Sélectionnez un prospect</div>
+                        <div class="chat-meta"><div class="chat-live-dot"></div> Conversation directe • IA via n8n</div>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-ghost" id="copy-chat" style="padding:10px 18px; font-size:0.8rem;">
+                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                            Copier tout
+                        </button>
+                        <button class="btn btn-ghost" id="reset-chat" style="padding:10px 18px; font-size:0.8rem;">
+                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                            Relancer
+                        </button>
+                    </div>
+                </div>
+                <div class="hormozi-bar">
+                    <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    Style Hormozi actif — Direct · Valeur élevée · Urgence réelle · Zéro compliments vides
+                </div>
+                <div class="messages-area" id="chat-messages"></div>
+                <div style="padding:8px 20px 4px; font-size:0.72rem; color:var(--text-muted);">Simulez la réponse du client pour générer la réplique IA</div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder='Ex: "Quel est le prix exact ?" ou "Hôtel loin du Haram ?"' style="flex:1;">
+                    <button class="btn btn-primary" id="send-reply" style="height:46px;">
+                        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        Répondre
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGE 4: Settings -->
+    <section class="page" id="page-parametres">
+        <div class="page-header">
+            <div class="page-title">Configuration</div>
+            <div class="page-sub">Gérez vos clés API, intégrations et préférences système</div>
+        </div>
+        <div class="settings-layout">
+            <div class="card">
+                <div class="settings-section-title">Clés API &amp; Fournisseur IA</div>
+                <div class="field">
+                    <label class="field-label">Clé Apify</label>
+                    <div class="input-with-action">
+                        <input type="password" id="apify-key" placeholder="apify_api_...">
+                        <div class="icon-btn" id="toggle-apify"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="field-label">Clé NVIDIA AI</label>
+                    <div class="input-with-action">
+                        <input type="password" id="nvidia-key" placeholder="nvapi-...">
+                        <div class="icon-btn" id="toggle-nvidia"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="field-label">Facebook Cookies (optionnel)</label>
+                    <textarea id="fb-cookies" rows="3" placeholder="c_user=...; xs=...; datr=..."></textarea>
+                </div>
+            </div>
+            <div class="card">
+                <div class="settings-section-title">Intégrations</div>
+                <div class="field">
+                    <label class="field-label">Webhook n8n (URL ngrok)</label>
+                    <div class="input-with-action">
+                        <input type="text" id="webhook-url" placeholder="https://xxx.ngrok-free.app/webhook/messenger-bot">
+                        <div class="icon-btn" id="detect-webhook" title="Détecter automatiquement">
+                            <svg viewBox="0 0 24 24"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0118.8-4.3M22 12.5a10 10 0 01-18.8 4.2"/></svg>
+                        </div>
+                    </div>
+                    <div style="font-size:0.7rem; color:var(--text-muted); margin-top:6px;">Le webhook chat IA sera : <code id="chat-endpoint-preview" style="color:var(--accent-1);">—</code></div>
+                </div>
+                <div class="field">
+                    <label class="field-label">Groupes Facebook (un par ligne)</label>
+                    <textarea id="fb-groups" rows="3" placeholder="https://www.facebook.com/groups/..."></textarea>
+                </div>
+                <div class="field">
+                    <label class="field-label">Domaine par défaut</label>
+                    <select id="default-domaine">
+                        <option>Omra / Hajj</option>
+                        <option>Automobile</option>
+                        <option>Immobilier</option>
+                        <option>Tourisme</option>
+                        <option>Formation &amp; Éducation</option>
+                        <option>Création Web &amp; App</option>
+                        <option>Montage Vidéo &amp; Design</option>
+                        <option>Marketing Digital</option>
+                        <option>E-commerce &amp; Dropshipping</option>
+                        <option>Coaching &amp; Consulting</option>
+                        <option>Vente de Logiciels (SaaS)</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <button class="btn btn-ghost" id="test-n8n-btn" style="width:100%;">
+                        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                        Tester la connexion n8n
+                    </button>
+                </div>
+            </div>
+            <div class="save-row">
+                <button class="btn btn-success" id="save-settings" style="width:100%; padding:16px; font-size:0.95rem;">
+                    <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Enregistrer la configuration
+                </button>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+(function(){
+    // ── Navigation
+    document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+            item.classList.add('active');
+            document.getElementById('page-'+item.dataset.page).classList.add('active');
+        });
+    });
+
+    // ── LocalStorage helpers
+    const ls = {
+        save: (k,v) => localStorage.setItem('alh_'+k, JSON.stringify(v)),
+        load: (k,d) => { try { return JSON.parse(localStorage.getItem('alh_'+k)) || d; } catch { return d; } }
+    };
+
+    // ── Settings
+    let cfg = ls.load('settings', {
+        apify: '', nvidia: '', webhook: '',
+        groups: '', domaine: 'Omra / Hajj', cookies: ''
+    });
+
+    // Load values into form
+    const applySettings = () => {
+        document.getElementById('apify-key').value      = cfg.apify;
+        document.getElementById('nvidia-key').value     = cfg.nvidia;
+        document.getElementById('webhook-url').value    = cfg.webhook;
+        document.getElementById('fb-groups').value      = cfg.groups;
+        document.getElementById('default-domaine').value = cfg.domaine;
+        document.getElementById('fb-cookies').value     = cfg.cookies;
+        document.getElementById('domaine-select').value = cfg.domaine;
+        updateWebhookPreview();
+        updateStatusBadges();
+    };
+
+    function updateWebhookPreview() {
+        const wh = document.getElementById('webhook-url').value.trim();
+        const preview = document.getElementById('chat-endpoint-preview');
+        if (wh) {
+            const base = wh.replace(/\/webhook\/.*$/, '');
+            preview.textContent = base + '/webhook/chat';
+        } else {
+            preview.textContent = '—';
+        }
+    }
+    document.getElementById('webhook-url').addEventListener('input', updateWebhookPreview);
+
+    function updateStatusBadges() {
+        const setCheck = (id, ok) => {
+            document.getElementById('chk-'+id).className = 'check-badge ' + (ok ? 'ok' : 'warn');
+            document.getElementById('chk-'+id+'-txt').className = 'check-status ' + (ok ? 'ok' : 'warn');
+            document.getElementById('chk-'+id+'-txt').textContent = ok ? 'Configurée' : 'Non configurée';
+        };
+        setCheck('apify', !!cfg.apify);
+        setCheck('nvidia', !!cfg.nvidia);
+        // webhook check is async
+    }
+
+    // ── Test n8n connection
+    async function testN8nConnection(silent = false) {
+        const wh = cfg.webhook;
+        if (!wh) {
+            updateN8nStatus(false, 'Webhook non configuré');
+            updateWebhookCheck(false, 'Non configuré');
+            if (!silent) showBanner('agent', 'warn', '⚠️ Webhook n8n non configuré. Allez dans les Paramètres.');
+            return false;
+        }
+        const chatUrl = wh.replace(/\/webhook\/.*$/, '') + '/webhook/chat';
+        try {
+            // Ping with a minimal test message
+            const res = await fetch(chatUrl, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: 'ping_test', sessionId: 'test'}),
+                signal: AbortSignal.timeout(6000)
+            });
+            if (res.ok || res.status === 200) {
+                updateN8nStatus(true, 'n8n: connecté ✓');
+                updateWebhookCheck(true, 'Connecté');
+                if (!silent) toast('Connexion n8n réussie!');
+                showBanner('agent', null, null);
+                showBanner('hunt', null, null);
+                return true;
+            } else {
+                throw new Error('HTTP ' + res.status);
+            }
+        } catch(e) {
+            const msg = e.name === 'TimeoutError' ? 'Timeout' : e.message;
+            updateN8nStatus(false, 'n8n: hors ligne');
+            updateWebhookCheck(false, 'Erreur: ' + msg);
+            if (!silent) toast('Connexion n8n échouée: ' + msg, true);
+            showBanner('agent', 'err', '❌ n8n non accessible. Vérifiez que n8n tourne et que ngrok est actif.');
+            showBanner('hunt', 'warn', '⚠️ n8n non disponible. La chasse utilisera une démo locale.');
+            return false;
+        }
+    }
+
+    function updateN8nStatus(ok, text) {
+        const pill = document.getElementById('n8n-status-pill');
+        const span = document.getElementById('n8n-status-text');
+        pill.className = 'n8n-pill ' + (ok ? '' : 'off');
+        span.textContent = text;
+    }
+
+    function updateWebhookCheck(ok, txt) {
+        document.getElementById('chk-webhook').className = 'check-badge ' + (ok ? 'ok' : 'warn');
+        document.getElementById('chk-webhook-txt').className = 'check-status ' + (ok ? 'ok' : 'warn');
+        document.getElementById('chk-webhook-txt').textContent = txt;
+    }
+
+    function showBanner(page, type, msg) {
+        const b = document.getElementById(page + '-conn-banner');
+        const m = document.getElementById(page + '-conn-msg');
+        if (!type) { b.style.display = 'none'; return; }
+        b.className = 'conn-banner ' + type;
+        b.style.display = 'flex';
+        if (m) m.textContent = msg;
+    }
+
+    // ── Auto-detect ngrok webhook
+    document.getElementById('detect-webhook').onclick = async () => {
+        toast('Recherche du webhook ngrok...');
+        // Try ngrok API (only works if accessed locally - fallback to stored)
+        try {
+            const res = await fetch('http://localhost:4040/api/tunnels', {signal: AbortSignal.timeout(2000)});
+            const data = await res.json();
+            const tunnel = data.tunnels.find(t => t.public_url.startsWith('https'));
+            if (tunnel) {
+                const url = tunnel.public_url + '/webhook/messenger-bot';
+                document.getElementById('webhook-url').value = url;
+                cfg.webhook = url;
+                ls.save('settings', cfg);
+                updateWebhookPreview();
+                toast('Webhook détecté: ' + tunnel.public_url);
+                await testN8nConnection(true);
+                return;
+            }
+        } catch(e) {}
+        // Fallback: try keyvalue store (set by local bat script)
+        toast('ngrok API inaccessible - tentative cloud...');
+    };
+
+    document.getElementById('test-n8n-btn').onclick = () => testN8nConnection(false);
+
+    // ── Save settings
+    document.getElementById('save-settings').onclick = async () => {
+        cfg.apify   = document.getElementById('apify-key').value.trim();
+        cfg.nvidia  = document.getElementById('nvidia-key').value.trim();
+        cfg.webhook = document.getElementById('webhook-url').value.trim();
+        cfg.groups  = document.getElementById('fb-groups').value.trim();
+        cfg.domaine = document.getElementById('default-domaine').value;
+        cfg.cookies = document.getElementById('fb-cookies').value.trim();
+        ls.save('settings', cfg);
+        document.getElementById('domaine-select').value = cfg.domaine;
+        updateWebhookPreview();
+        updateStatusBadges();
+        toast('Configuration enregistrée!');
+        await testN8nConnection(true);
+    };
+
+    // Toggle visibility
+    ['apify','nvidia'].forEach(k => {
+        document.getElementById('toggle-'+k).onclick = () => {
+            const inp = document.getElementById(k+'-key');
+            inp.type = inp.type === 'password' ? 'text' : 'password';
+        };
+    });
+
+    // ── Toast
+    function toast(msg, isErr=false) {
+        const el = document.createElement('div');
+        el.className = 'toast' + (isErr ? ' err' : '');
+        const icon = isErr
+            ? `<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`
+            : `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+        el.innerHTML = icon + ' ' + msg;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 3800);
+    }
+
+    // ── Demo / real leads management
+    let currentLeads = [];
+    const demoLeads = [
+        { name:'Karim B.', post:'Cherche agence omra sérieuse pour famille', score:'Élevé', scoreClass:'pill-high', profile:'#', initial:'K' },
+        { name:'Sophie M.', post:'Besoin visa hajj urgent mars', score:'Moyen', scoreClass:'pill-med', profile:'#', initial:'S' },
+        { name:'Ali R.', post:'Voyage omra organisé, avion inclus?', score:'Élevé', scoreClass:'pill-high', profile:'#', initial:'A' },
+        { name:'Nadia K.', post:'Comparatif prix omra 2025', score:'Faible', scoreClass:'pill-low', profile:'#', initial:'N' },
+        { name:'Omar D.', post:'Recherche package hajj all inclusive', score:'Élevé', scoreClass:'pill-high', profile:'#', initial:'O' },
+    ];
+
+    function renderTable(leads) {
+        const tbody = document.querySelector('#leads-table tbody');
+        tbody.innerHTML = leads.map(l => `
+            <tr>
+                <td><strong style="font-weight:600;">${l.name}</strong></td>
+                <td style="color:var(--text-secondary); max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${l.post}</td>
+                <td><span class="interest-pill ${l.scoreClass}"><span class="dot"></span>${l.score}</span></td>
+                <td><a href="${l.profile}" style="color:var(--accent-2); text-decoration:none; font-size:0.8rem;">Voir profil</a></td>
+                <td><button class="btn btn-ghost" style="padding:7px 16px; font-size:0.78rem;" onclick="startChatWith(${leads.indexOf(l)})">Contacter</button></td>
+            </tr>
+        `).join('');
+        const n = leads.length;
+        const interested = leads.filter(l=>l.score==='Élevé'||l.score==='Moyen').length;
+        document.getElementById('stat-total').textContent = n;
+        document.getElementById('stat-interested').textContent = interested;
+        document.getElementById('stat-processed').textContent = n;
+        document.getElementById('stat-rate').textContent = n ? Math.round(interested/n*100)+'%' : '—';
+    }
+
+    function renderLeadList(leads) {
+        currentLeads = leads;
+        const c = document.getElementById('lead-list');
+        c.innerHTML = leads.map((l,i) => `
+            <div class="lead-row" data-i="${i}" onclick="selectLead(${i})">
+                <div class="avatar-circle">${l.initial}</div>
+                <div class="lead-info">
+                    <div class="lead-name">${l.name}</div>
+                    <div class="lead-preview">${l.post}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    window.selectLead = function(i) {
+        document.querySelectorAll('.lead-row').forEach(r=>r.classList.remove('active'));
+        const row = document.querySelector(`.lead-row[data-i="${i}"]`);
+        if (row) row.classList.add('active');
+        loadChat(currentLeads[i]);
+    };
+
+    window.startChatWith = function(i) {
+        // Switch to delegate page
+        document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.getElementById('nav-delegue').classList.add('active');
+        document.getElementById('page-delegue').classList.add('active');
+        renderLeadList(currentLeads.length ? currentLeads : demoLeads);
+        window.selectLead(i);
+    };
+
+    let activeLead = null;
+    let chatHistory = [];
+
+    function loadChat(lead) {
+        activeLead = lead;
+        document.getElementById('chat-client-name').textContent = lead.name;
+        const area = document.getElementById('chat-messages');
+        area.innerHTML = '';
+        chatHistory = [];
+
+        const greeting = `Bonjour ${lead.name.split('.')[0]}, j'ai vu votre publication concernant : "${lead.post.slice(0,50)}...". Je peux vous aider directement. Qu'est-ce qui est le plus important pour vous ?`;
+        addBubble('ai', greeting);
+        chatHistory.push({ role: 'assistant', content: greeting });
+    }
+
+    function addBubble(role, text) {
+        const area = document.getElementById('chat-messages');
+        const isAI = role === 'ai';
+        const wrap = document.createElement('div');
+        wrap.className = `msg-wrap ${isAI ? 'from-ai' : ''}`;
+        const initial = isAI ? 'IA' : (activeLead ? activeLead.initial : 'C');
+        const time = new Date().toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'});
+        wrap.innerHTML = `
+            <div class="msg-avatar ${role}">${initial}</div>
+            <div>
+                <div class="bubble ${role}"></div>
+                <div class="bubble-meta">
+                    ${time}
+                    ${isAI ? `<button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.msg-wrap').querySelector('.bubble').textContent)"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copier</button>` : ''}
+                </div>
+            </div>
+        `;
+        wrap.querySelector('.bubble').textContent = text;
+        area.appendChild(wrap);
+        area.scrollTop = area.scrollHeight;
+    }
+
+    // ── Call AI via n8n backend (CORS-safe)
+    async function callAI(userMessage) {
+        const webhookBase = cfg.webhook ? cfg.webhook.replace(/\/webhook\/.*$/, '') : null;
+        if (!webhookBase) {
+            return 'Erreur: Webhook n8n non configuré. Allez dans les Paramètres.';
+        }
+        const chatUrl = webhookBase + '/webhook/chat';
+        try {
+            const res = await fetch(chatUrl, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    message: userMessage,
+                    domaine: cfg.domaine || 'Omra / Hajj',
+                    sessionId: activeLead ? activeLead.name.replace(/\s/g,'_') : 'default',
+                    history: chatHistory.slice(-6)  // last 3 exchanges for context
+                }),
+                signal: AbortSignal.timeout(15000)
+            });
+            const data = await res.json();
+            return data.reply || data.message || 'Réponse reçue.';
+        } catch(e) {
+            return `Erreur de connexion à n8n: ${e.message}. Vérifiez que n8n est en marche.`;
+        }
+    }
+
+    document.getElementById('send-reply').onclick = async () => {
+        const inp = document.getElementById('chat-input');
+        const userText = inp.value.trim();
+        if (!userText || !activeLead) return;
+
+        addBubble('client', userText);
+        inp.value = '';
+        chatHistory.push({ role: 'user', content: userText });
+
+        const area = document.getElementById('chat-messages');
+        const typing = document.createElement('div');
+        typing.className = 'msg-wrap from-ai';
+        typing.innerHTML = `<div class="msg-avatar ai">IA</div><div class="bubble ai typing-indicator"><span></span><span></span><span></span></div>`;
+        area.appendChild(typing);
+        area.scrollTop = area.scrollHeight;
+
+        const btn = document.getElementById('send-reply');
+        btn.disabled = true;
+
+        const aiResponseText = await callAI(userText);
+        typing.remove();
+        btn.disabled = false;
+        addBubble('ai', aiResponseText);
+        chatHistory.push({ role: 'assistant', content: aiResponseText });
+    };
+
+    document.getElementById('chat-input').addEventListener('keydown', e => {
+        if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('send-reply').click(); }
+    });
+
+    document.getElementById('copy-chat').onclick = () => {
+        const bubbles = [...document.querySelectorAll('.bubble:not(.typing-indicator)')];
+        const text = bubbles.map(b => b.textContent.trim()).join('\n\n');
+        navigator.clipboard.writeText(text).then(() => toast('Conversation copiée'));
+    };
+
+    document.getElementById('reset-chat').onclick = () => {
+        if (activeLead) loadChat(activeLead);
+    };
+
+    // ── Hunt: call n8n Apify webhook
+    document.getElementById('start-hunt').addEventListener('click', async () => {
+        const fbLink = document.getElementById('fb-link').value.trim();
+        const domaine = document.getElementById('domaine-select').value;
+        const fill = document.getElementById('progress-fill');
+        const label = document.getElementById('progress-label');
+        const btn = document.getElementById('start-hunt');
+
+        if (!fbLink) { toast('Entrez un lien de groupe Facebook', true); return; }
+
+        btn.disabled = true;
+        fill.style.width = '5%';
+        label.textContent = 'Connexion à n8n...';
+
+        const webhookBase = cfg.webhook ? cfg.webhook.replace(/\/webhook\/.*$/, '') : null;
+        
+        if (!webhookBase) {
+            // Demo mode
+            label.textContent = 'Mode démo (webhook non configuré)...';
+            const demoSteps = [
+                [400, '25%', 'Simulation Apify...'],
+                [900, '55%', 'Classification IA...'],
+                [1400, '80%', 'Filtrage leads...'],
+                [1900, '100%', '5 leads simulés trouvés'],
+            ];
+            demoSteps.forEach(([ms, w, txt]) => setTimeout(() => { fill.style.width = w; label.textContent = txt; }, ms));
+            setTimeout(() => {
+                currentLeads = demoLeads;
+                renderTable(demoLeads);
+                renderLeadList(demoLeads);
+                toast('Démo: 5 leads simulés (configurez n8n pour de vrais leads)');
+                btn.disabled = false;
+            }, 2200);
+            return;
+        }
+
+        // Real hunt via n8n
+        const huntUrl = webhookBase + '/webhook/hunt';
+        fill.style.width = '15%';
+        label.textContent = 'Envoi à n8n...';
+
+        try {
+            const res = await fetch(huntUrl, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    groupUrl: fbLink,
+                    domaine: domaine,
+                    apifyToken: cfg.apify,
+                    cookies: cfg.cookies
+                }),
+                signal: AbortSignal.timeout(60000)
+            });
+
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            
+            fill.style.width = '70%';
+            label.textContent = 'Traitement des leads...';
+            
+            const data = await res.json();
+            const leads = (data.leads || data.items || []).map(l => ({
+                name: l.name || l.authorName || 'Inconnu',
+                post: l.post || l.text || l.message || '',
+                score: l.score || l.interest || 'Moyen',
+                scoreClass: l.score === 'Élevé' ? 'pill-high' : l.score === 'Faible' ? 'pill-low' : 'pill-med',
+                profile: l.profileUrl || l.url || '#',
+                initial: (l.name || l.authorName || 'I')[0].toUpperCase()
+            }));
+
+            fill.style.width = '100%';
+            label.textContent = `${leads.length} leads trouvés!`;
+
+            if (leads.length > 0) {
+                currentLeads = leads;
+                renderTable(leads);
+                renderLeadList(leads);
+                toast(`${leads.length} vrais leads de Facebook!`);
+            } else {
+                renderTable(demoLeads); renderLeadList(demoLeads);
+                toast('Aucun lead trouvé - données démo affichées');
+            }
+        } catch(e) {
+            fill.style.width = '100%';
+            label.textContent = 'Erreur - affichage démo';
+            renderTable(demoLeads); renderLeadList(demoLeads);
+            toast('Erreur n8n: ' + e.message, true);
+        } finally {
+            btn.disabled = false;
+        }
+    });
+
+    // ── Init
+    applySettings();
+    renderTable(demoLeads);
+    renderLeadList(demoLeads);
+    setTimeout(() => {
+        const first = document.querySelector('.lead-row');
+        if(first) { first.classList.add('active'); loadChat(demoLeads[0]); }
+    }, 100);
+
+    // Auto-check n8n on load
+    setTimeout(() => testN8nConnection(true), 500);
+})();
+</script>
+</body>
+</html>
