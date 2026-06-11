@@ -120,22 +120,9 @@ export default function Settings({ settings, updateSettings }) {
           </div>
         </div>
 
-        {/* n8n & AI Settings */}
+        {/* AI Settings */}
         <div className="card">
-          <div className="section-title">🤖 إعدادات n8n والذكاء الاصطناعي</div>
-
-          <div className="form-group">
-            <label className="form-label">n8n Webhook URL</label>
-            <input
-              id="n8n-webhook"
-              type="text"
-              className="form-input"
-              placeholder="http://localhost:5678/webhook/..."
-              value={localSettings.n8nWebhookUrl}
-              onChange={e => handleChange('n8nWebhookUrl', e.target.value)}
-            />
-            <p className="form-hint">رابط webhook الخاص بـ n8n لاستقبال طلبات التشغيل</p>
-          </div>
+          <div className="section-title">🤖 إعدادات الذكاء الاصطناعي</div>
 
           <div className="form-group">
             <label className="form-label">NVIDIA API Key</label>
