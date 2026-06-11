@@ -8,7 +8,7 @@ const DEFAULT_SETTINGS = {
   apifyActorId: 'apify~facebook-groups-scraper',
   facebookCookies: '',
   facebookGroupUrls: '',
-  n8nWebhookUrl: 'https://amine-lead-hunter-2026.loca.lt/webhook/chat',
+  n8nWebhookUrl: 'https://itchy-bear-62.loca.lt/webhook/chat',
   nvidiaApiKey: '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',
   selectedNiche: 'عمرة',
   customNiche: '',
