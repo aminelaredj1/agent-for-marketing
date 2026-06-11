@@ -8,7 +8,7 @@ const DEFAULT_SETTINGS = {
   apifyActorId: 'apify~facebook-groups-scraper',
   facebookCookies: '',
   facebookGroupUrls: '',
-  n8nWebhookUrl: 'https://33b0-105-235-138-242.ngrok-free.app/webhook/chat',
+  n8nWebhookUrl: 'https://rfc-crystal-determining-worth.trycloudflare.com/webhook/chat',
   nvidiaApiKey: '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',
   selectedNiche: 'عمرة',
   customNiche: '',
