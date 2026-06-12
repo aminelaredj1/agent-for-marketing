@@ -8,7 +8,7 @@ const DEFAULT_SETTINGS = {
   apifyActorId: 'apify~facebook-groups-scraper',
   facebookCookies: '',
   facebookGroupUrls: '',
-  n8nWebhookUrl: 'https://subsection-generations-houston-twiki.trycloudflare.com/webhook/AIChatWorkflow02/chat/chat',
+  n8nWebhookUrl: 'https://knee-occupation-cricket-dependence.trycloudflare.com/webhook/AIChatWorkflow02/chat/chat',
   nvidiaApiKey: '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',
   selectedNiche: 'عمرة',
   customNiche: '',
